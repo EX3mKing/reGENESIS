@@ -3,6 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+public struct Bonuses
+{
+    public int Health;
+    public int Defense;
+    public int Attack;
+}
+
 public class Equipment : MonoBehaviour
 {
     [SerializeField] private BaseHelmeth helmeth;
@@ -15,12 +22,7 @@ public class Equipment : MonoBehaviour
     private int _health = 0;
     private int _defense = 0;
     private int _attack = 0;
-
-    private void Start()
-    {
-        CalculateTotalBonus();
-    }
-
+    
     private void ResetItemsList()
     {
         _items.Clear();
@@ -35,21 +37,16 @@ public class Equipment : MonoBehaviour
         
     }
 
-    private void CalculateTotalBonus()
+    public Bonuses CalculateTotalBonus()
     {
         ResetItemsList();
+        Bonuses bonuses = new Bonuses();
         foreach (BaseItem item in _items)
         {
-            _attack += item.attack;
-            _defense += item.defense;
+            bonuses.Attack += item.attack;
+            bonuses.Defense += item.defense;
         }
-        if (companion != null) _health += companion.health;
-    }
-
-    public BaseItem GetRandomItem()
-    {
-        ResetItemsList();
-        int i = Random.Range(0, _items.Count);
-        return _items[i];
+        if (companion != null) bonuses.Health += companion.health;
+        return bonuses;
     }
 }

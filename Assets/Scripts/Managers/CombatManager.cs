@@ -5,6 +5,7 @@ public class CombatManager : MonoBehaviour
 {
 	[SerializeField] private Canvas[] canvases;
 	[SerializeField] private CanvasGroup[] canvasGroups;
+	[SerializeField] private GameObject[] Enemies;
 
 	public float lerpSpeed;
 
@@ -12,6 +13,7 @@ public class CombatManager : MonoBehaviour
 	public const int TAKE_LEAVE = 1;
 	public const int SETTINGS = 2;
 	public const int ENGAGE = 3;
+	public const int STATS = 4;
 	
 	private void Start()
 	{

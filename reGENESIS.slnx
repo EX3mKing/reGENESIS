@@ -34,6 +34,7 @@
   <Project Path="Unity.CollabProxy.Editor.csproj" />
   <Project Path="Unity.VisualScripting.State.Editor.csproj" />
   <Project Path="Unity.Burst.CodeGen.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
   <Project Path="Unity.VisualScripting.Flow.csproj" />
   <Project Path="Unity.PerformanceTesting.csproj" />
   <Project Path="Unity.2D.Tilemap.Extras.Editor.csproj" />
@@ -76,6 +77,5 @@
   <Project Path="Unity.RenderPipelines.Universal.Config.Runtime.csproj" />
   <Project Path="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.csproj" />
   <Project Path="Unity.RenderPipelines.Core.ShaderLibrary.csproj" />
-  <Project Path="Assembly-CSharp.csproj" />
   <Project Path="Unity.RenderPipelines.Core.Editor.Shared.csproj" />
 </Solution>
