@@ -26,8 +26,10 @@ public class UIManager : MonoBehaviour
 	/// <param name="canvasGroup">Canvas group whose alpha is being interpolated</param>
 	/// <param name="targetAlpha">Desired alpha value</param>
 	/// <param name="speed">speed at which alpha is interpolated</param>
-	public IEnumerator InterpolateCanvasGroupAlpha(CanvasGroup canvasGroup, float targetAlpha, float speed)
+	public IEnumerator InterpolateCanvasGroupAlpha(
+		CanvasGroup canvasGroup, float targetAlpha, float speed, bool disableOnEnd = false)
 	{
+		canvasGroup.interactable = false;
 		try
 		{
 			if (speed < 0f)
@@ -82,6 +84,8 @@ public class UIManager : MonoBehaviour
 			if (Extras.NearlyEqual(canvasGroup.alpha, targetAlpha, 0.3f)) break;
 		}
 		canvasGroup.alpha = targetAlpha;
+		canvasGroup.interactable = true;
+		if (disableOnEnd) canvasGroup.gameObject.SetActive(false);
 	}
 	
 }

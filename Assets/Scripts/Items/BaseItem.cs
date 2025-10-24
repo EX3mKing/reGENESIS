@@ -23,6 +23,7 @@ public abstract class BaseItem : ScriptableObject
     [Space(15f)]
     public int defense;
     public int attack;
+    public int maxHealth;
 
     public BaseItem(ItemType itemType)
     {
