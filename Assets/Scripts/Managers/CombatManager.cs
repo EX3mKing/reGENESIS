@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class CombatManager : MonoBehaviour
 {
@@ -12,8 +12,16 @@ public class CombatManager : MonoBehaviour
 	[SerializeField] private Entity playerEntity;
 	[SerializeField] private TextMeshProUGUI playerStatsTMP;
 	[SerializeField] private TextMeshProUGUI enemyStatsTMP;
+	[SerializeField] private Image itemDropImage;
+	[SerializeField] private TextMeshProUGUI coinDropTMP;
+
+	private ItemDrop _itemDrop = null;
+	private int _coinsDrop = 0;
+	private int _enemyIndex = 0;
+	private Entity _enemyEntity;
 
 	public float canvasLerpSpeed;
+	public float timeBetweenAttacks;
 
 	public const int INVENTORY = 0;
 	public const int TAKE_LEAVE = 1;
@@ -23,6 +31,8 @@ public class CombatManager : MonoBehaviour
 
 	private void Start()
 	{
+		GameObject go = Instantiate(enemyEntities[_enemyIndex]);
+		_enemyEntity = go.GetComponent<Entity>();
 		ResetAllCanvases();
 		ShowCanvas(ENGAGE, false);
 	}
@@ -36,7 +46,7 @@ public class CombatManager : MonoBehaviour
 		}
 	}
 
-	private void ShowCanvas(int index, bool hideOthers = true)
+	private void ShowCanvas(int index, bool hideOthers)
 	{
 		canvases[index].gameObject.SetActive(true);
 		StartCoroutine(UIManager.Instance.InterpolateCanvasGroupAlpha(
@@ -89,17 +99,17 @@ public class CombatManager : MonoBehaviour
 			if (player.Health <= 0)
 			{
 				Debug.Log("Died");
+				EndCombat(false, player);
 				yield break;
 			}
 			else if (enemy.Health <= 0)
 			{
-				Debug.Log("go next enemy");
 				EndCombat(true, enemy);
 				yield break;
 			}
 			
 			playersTurn = !playersTurn;
-			yield return new WaitForSeconds(2f);
+			yield return new WaitForSeconds(timeBetweenAttacks);
 		}
 
 		//yield return null;
@@ -122,22 +132,27 @@ public class CombatManager : MonoBehaviour
 
 	public void OnEngage()
 	{
-		if (enemyEntities[0].TryGetComponent<Entity>(out var enemyEntity))
-		{
-			ShowCanvas(STATS, false);
-			UpdateStats(playerEntity, enemyEntity);
-			StartCoroutine(Combat(playerEntity, enemyEntity));
-			HideCanvas(ENGAGE);
-		}
-		else Debug.LogError($"ENEMY OBJECT DOESNT HAVE ENTITY");
+		ShowCanvas(STATS, false);
+		UpdateStats(playerEntity, _enemyEntity);
+		StartCoroutine(Combat(playerEntity, _enemyEntity));
+		HideCanvas(ENGAGE);
 	}
 
 	private void EndCombat(bool playerLived, Entity deadEntity)
 	{
 		if (playerLived)
 		{
-			ShowCanvas(TAKE_LEAVE);
+			_itemDrop = deadEntity.GetComponent<ItemDrop>();
+			_coinsDrop = deadEntity.Coins;
+			ShowCanvas(TAKE_LEAVE, true);
+			itemDropImage.sprite = _itemDrop.item.itemSprite;
+			coinDropTMP.text = $"+{_coinsDrop}";
+			//StartCoroutine(FadeOutSprite(deadEntity.SpriteRenderer, 2f));
 			StartCoroutine(FadeOutSprite(deadEntity.SpriteRenderer, 2f, true));
+		}
+		else
+		{
+			Debug.Log("Player died");
 		}
 	}
 
@@ -169,6 +184,76 @@ public class CombatManager : MonoBehaviour
 			yield return null;
 		}
 		if (destroyGameObjectOnEnd) Destroy(sr.gameObject);
+	}
+
+	private void EquipItem<T>(T item) where T : BaseItem
+	{
+		if (item == null)
+		{
+			Debug.LogError($"ITEM IS NULL");
+			return;
+		}
+		
+		if (!typeof(BaseItem).IsAssignableFrom(typeof(T)))
+		{
+			Debug.LogError($"WRONG TYPE PASSED AS EQUIPMENT: {typeof(T).Name}");
+			return;
+		}
+
+		switch (item)
+		{
+			case BaseHelmeth helmeth:
+				playerEntity.equipment.helmeth = helmeth;
+				break;
+			case BaseArmor armor:
+				playerEntity.equipment.armor = armor;
+				break;
+			case BaseWeapon weapon:
+				playerEntity.equipment.weapon = weapon;
+				break;
+			case BaseCompanion companion:
+				playerEntity.equipment.companion = companion;
+				break;
+			case BaseBind bind:
+				playerEntity.equipment.binds.Add(bind);
+				break;
+			default:
+				Debug.LogError("Item is not one of main 5 categories");
+				break;
+		}
+		
+		playerEntity.equipment.CalculateTotalBonus();
+	}
+
+	public void TakeOrLeave(bool take)
+	{
+		if (take)
+		{
+			EquipItem(_itemDrop.item);
+		}
+		else
+		{
+			playerEntity.Coins += _coinsDrop;
+		}
+
+		_coinsDrop = 0;
+		_itemDrop = null;
+		
+		NextEncounter();
+	}
+
+	private void NextEncounter()
+	{
+		Debug.Log("NEXT ENCOUNTER");
+		SpawnNextEnemy();
+		ShowCanvas(ENGAGE, true);
+	}
+
+	private void SpawnNextEnemy()
+	{
+		_enemyIndex++;
+		GameObject go = Instantiate(enemyEntities[_enemyIndex]);
+		_enemyEntity = go.GetComponent<Entity>();
 	}
 	
 }

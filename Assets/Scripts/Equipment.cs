@@ -4,11 +4,11 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 public class Equipment : MonoBehaviour
 {
-    [SerializeField] private BaseHelmeth helmeth;
-    [SerializeField] private BaseArmor armor;
-    [SerializeField] private BaseWeapon weapon;
-    [SerializeField] private BaseCompanion companion;
-    [SerializeField] private BaseBind[] binds;
+    public BaseHelmeth helmeth;
+    public BaseArmor armor;
+    public BaseWeapon weapon;
+    public BaseCompanion companion;
+    public List<BaseBind> binds;
     private List<BaseItem> _items = new List<BaseItem>();
 
     public int healing;
