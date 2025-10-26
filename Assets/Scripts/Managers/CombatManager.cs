@@ -14,6 +14,7 @@ public class CombatManager : MonoBehaviour
 	[SerializeField] private TextMeshProUGUI enemyStatsTMP;
 	[SerializeField] private Image itemDropImage;
 	[SerializeField] private TextMeshProUGUI coinDropTMP;
+	[SerializeField] private InventoryUIManager inventoryUIManager;
 
 	private ItemDrop _itemDrop = null;
 	private int _coinsDrop = 0;
@@ -65,6 +66,17 @@ public class CombatManager : MonoBehaviour
 		}
 	}
 
+	public void ShowArmory()
+	{
+		ShowCanvas(INVENTORY, true);
+		inventoryUIManager.UpdateInventory();
+	}
+
+	public void ShowEngage()
+	{
+		ShowCanvas(ENGAGE, true);
+	}
+
 	public void HideCanvas(int index, bool disableOnEnd = true)
 	{
 		//canvases[index].gameObject.SetActive(true);
@@ -92,7 +104,7 @@ public class CombatManager : MonoBehaviour
 			}
 			
 			int damage = attacker.Attack - defender.Defense + (attacker.Attack - defender.Defense == 0 ? 1 : 0);
-			defender.Health -= damage;
+			defender.Health = Mathf.Clamp(defender.Health - damage, 0, defender.Health);
 			StartCoroutine(ShakeObject(defender.gameObject));
 			UpdateStats(player, enemy);
 
