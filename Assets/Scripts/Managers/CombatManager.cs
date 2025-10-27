@@ -15,6 +15,7 @@ public class CombatManager : MonoBehaviour
 	[SerializeField] private Image itemDropImage;
 	[SerializeField] private TextMeshProUGUI coinDropTMP;
 	[SerializeField] private InventoryUIManager inventoryUIManager;
+	[SerializeField] private ShopManager shopManager;
 
 	private ItemDrop _itemDrop = null;
 	private int _coinsDrop = 0;
@@ -29,6 +30,7 @@ public class CombatManager : MonoBehaviour
 	public const int SETTINGS = 2;
 	public const int ENGAGE = 3;
 	public const int STATS = 4;
+	public const int SHOP = 5;
 
 	private void Start()
 	{
@@ -257,8 +259,17 @@ public class CombatManager : MonoBehaviour
 	private void NextEncounter()
 	{
 		Debug.Log("NEXT ENCOUNTER");
-		SpawnNextEnemy();
-		ShowCanvas(ENGAGE, true);
+		
+		if (_enemyIndex +1 >= enemyEntities.Length)
+		{
+			shopManager.PickShopItems();
+			ShowCanvas(SHOP, true);
+		}
+		else
+		{
+			SpawnNextEnemy();
+			ShowCanvas(ENGAGE, true);
+		}
 	}
 
 	private void SpawnNextEnemy()
